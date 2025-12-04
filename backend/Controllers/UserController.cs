@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using PokemonBattle.Services;
 using PokemonBattle.DTOs;
 
@@ -6,6 +7,7 @@ namespace PokemonBattle.Controllers {
 
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class UserController : ControllerBase {
         private readonly UserService _userService;
 
@@ -14,6 +16,7 @@ namespace PokemonBattle.Controllers {
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public IActionResult CreateUser([FromBody] CreateUserRequest request) {
 
             // Validation: Name is required
@@ -68,6 +71,7 @@ namespace PokemonBattle.Controllers {
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult GetAllUsers() {
             var users = _userService.GetAllUsers();
             var response = users.Select(kvp => UserResponse.FromCharacter(kvp.Value, kvp.Key)).ToList();
@@ -196,7 +200,7 @@ namespace PokemonBattle.Controllers {
 
         [HttpGet("{id}/pokemon")]
         public IActionResult GetUserPokemon(string id) {
-            
+
             // Validation: Check if ID is provided
             if (string.IsNullOrWhiteSpace(id)) {
                 return BadRequest(new { error = "User ID is required" });
@@ -216,6 +220,7 @@ namespace PokemonBattle.Controllers {
         }
 
         [HttpGet("pokemon/types")]
+        [AllowAnonymous]
         public IActionResult GetAvailablePokemonTypes() {
             var types = PokemonFactory.GetAvailablePokemonTypes();
             return Ok(types);
