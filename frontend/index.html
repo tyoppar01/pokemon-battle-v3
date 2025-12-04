@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Battle</title>
+    <link rel="stylesheet" href="/frontend/styles/styles.css">
+</head>
+<body>
+    <div class="terminal-container">
+        <!-- ASCII Logo -->
+        <div class="ascii-logo">
+            <pre id="logoArt"></pre>
+        </div>
+
+        <!-- Main Menu Screen -->
+        <div id="mainMenu" class="screen active">
+            <div class="menu-box">
+                <div class="menu-header">═══ MAIN MENU ═══</div>
+                <div class="menu-options">
+                    <div class="menu-option" data-action="selectPlayers">1. Start Battle</div>
+                    <div class="menu-option" data-action="createUser">2. Create New Trainer</div>
+                    <div class="menu-option" data-action="viewUsers">3. View All Trainers</div>
+                    <div class="menu-option" data-action="viewPokemon">4. View All Pokemon</div>
+                </div>
+                <div class="menu-footer">Choose action (1-4):</div>
+            </div>
+        </div>
+
+        <!-- Select Players Screen -->
+        <div id="selectPlayersScreen" class="screen">
+            <div class="menu-box">
+                <div class="menu-header">═══ SELECT TRAINERS ═══</div>
+                
+                <div class="player-selection">
+                    <div class="selection-group">
+                        <div class="label">Trainer 1:</div>
+                        <select id="player1Select" class="terminal-select">
+                            <option value="">Select trainer...</option>
+                        </select>
+                        <div id="player1Preview" class="trainer-preview"></div>
+                    </div>
+
+                    <div class="vs-divider">VS</div>
+
+                    <div class="selection-group">
+                        <div class="label">Trainer 2:</div>
+                        <select id="player2Select" class="terminal-select">
+                            <option value="">Select trainer...</option>
+                        </select>
+                        <div id="player2Preview" class="trainer-preview"></div>
+                    </div>
+                </div>
+
+                <div class="menu-actions">
+                    <button class="terminal-btn" id="confirmBattleBtn">► START BATTLE</button>
+                    <button class="terminal-btn secondary" id="backToMainBtn">◄ BACK</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create User Screen -->
+        <div id="createUserScreen" class="screen">
+            <div class="menu-box">
+                <div class="menu-header">═══ CREATE NEW TRAINER ═══</div>
+                
+                <div class="form-section">
+                    <div class="form-row">
+                        <label>Trainer Name:</label>
+                        <input type="text" id="newTrainerName" class="terminal-input" placeholder="Enter name">
+                    </div>
+                    
+                    <div class="form-row">
+                        <label>Gender:</label>
+                        <select id="newTrainerGender" class="terminal-select">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="team-section">
+                    <div class="section-title">Build Your Team (Max 6 Pokemon)</div>
+                    
+                    <div class="pokemon-grid">
+                        <div class="pokemon-option" data-pokemon="Pikachu">1. Pikachu (Electric)</div>
+                        <div class="pokemon-option" data-pokemon="Charmander">2. Charmander (Fire)</div>
+                        <div class="pokemon-option" data-pokemon="Squirtle">3. Squirtle (Water)</div>
+                        <div class="pokemon-option" data-pokemon="Bulbasaur">4. Bulbasaur (Grass)</div>
+                        <div class="pokemon-option" data-pokemon="Gengar">5. Gengar (Ghost)</div>
+                        <div class="pokemon-option" data-pokemon="Mewtwo">6. Mewtwo (Psychic)</div>
+                        <div class="pokemon-option" data-pokemon="Snorlax">7. Snorlax (Normal)</div>
+                        <div class="pokemon-option" data-pokemon="Aron">8. Aron (Steel)</div>
+                    </div>
+
+                    <div class="current-team-display">
+                        <div class="team-header">Current Team: <span id="teamCounter">0</span>/6</div>
+                        <div id="teamDisplay" class="team-list"></div>
+                    </div>
+                </div>
+
+                <div class="menu-actions">
+                    <button class="terminal-btn" id="saveTrainerBtn">✓ CREATE TRAINER</button>
+                    <button class="terminal-btn secondary" id="cancelCreateBtn">◄ BACK</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- View Users Screen -->
+        <div id="viewUsersScreen" class="screen">
+            <div class="menu-box">
+                <div class="menu-header">═══ ALL TRAINERS ═══</div>
+                <div id="usersList" class="users-list"></div>
+                <div class="menu-actions">
+                    <button class="terminal-btn secondary" id="backFromUsersBtn">◄ BACK</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- View Pokemon Screen -->
+        <div id="viewPokemonScreen" class="screen">
+            <div class="menu-box">
+                <div class="menu-header">═══ PLAYABLE POKEMON ═══</div>
+                <div id="pokemonList" class="pokemon-list"></div>
+                <div class="menu-actions">
+                    <button class="terminal-btn secondary" id="backFromPokemonBtn">◄ BACK</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Battle Screen -->
+        <div id="battleScreen" class="screen">
+            <div class="battle-status-box">
+                <div class="battle-header">═══ BATTLE IN PROGRESS ═══</div>
+                
+                <div class="pokemon-battle-display">
+                    <div class="pokemon-side">
+                        <img id="battlePlayer1Sprite" class="battle-sprite" alt="Player 1">
+                        <div class="pokemon-stats">
+                            <div class="stat-name" id="battlePlayer1Name"></div>
+                            <div class="stat-hp" id="battlePlayer1HP"></div>
+                            <div class="health-bar">
+                                <div id="battlePlayer1HealthBar" class="health-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="battle-vs">VS</div>
+
+                    <div class="pokemon-side">
+                        <img id="battlePlayer2Sprite" class="battle-sprite" alt="Player 2">
+                        <div class="pokemon-stats">
+                            <div class="stat-name" id="battlePlayer2Name"></div>
+                            <div class="stat-hp" id="battlePlayer2HP"></div>
+                            <div class="health-bar">
+                                <div id="battlePlayer2HealthBar" class="health-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Battle Actions Menu -->
+            <div id="battleActionsMenu" class="battle-menu">
+                <div class="menu-box small">
+                    <div class="menu-header">BATTLE ACTIONS</div>
+                    <div class="menu-options">
+                        <div class="menu-option" data-action="fight">1. FIGHT</div>
+                        <div class="menu-option disabled" data-action="pokemon">2. POKEMON</div>
+                    </div>
+                    <div class="menu-footer">Choose action (1-2):</div>
+                </div>
+            </div>
+
+            <!-- Fight Menu -->
+            <div id="fightMenu" class="battle-menu hidden">
+                <div class="menu-box small">
+                    <div class="menu-header">FIGHT MENU</div>
+                    <div class="menu-options">
+                        <div class="menu-option" data-attack="normal" id="normalAttackOption"></div>
+                        <div class="menu-option special" data-attack="special" id="specialAttackOption"></div>
+                        <div class="menu-option disabled">3. (Reserved Move)</div>
+                        <div class="menu-option disabled">4. (Reserved Move)</div>
+                    </div>
+                    <div class="menu-options">
+                        <div class="menu-option secondary" data-action="back">B. ◄ Back to Main Menu</div>
+                    </div>
+                    <div class="menu-footer">Choose attack (1-4, B):</div>
+                </div>
+            </div>
+
+            <!-- Battle Log Console -->
+            <div class="battle-console">
+                <div class="console-header">═══ BATTLE LOG ═══</div>
+                <div id="battleLogTerminal" class="console-log"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
