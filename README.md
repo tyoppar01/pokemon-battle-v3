@@ -55,3 +55,17 @@ Access the game at **http://localhost:8000**
 - Turn-based battle system with type effectiveness
 - SQLite persistent storage
 - RESTful API architecture
+
+## 🛠️ Technical Stack
+
+### API & Data Exchange
+- **Automatic JSON Serialization** - C# objects automatically converted to JSON responses for frontend consumption via ASP.NET Core's built-in serialization
+
+### Security
+- **Input Validation** - Dual-layer validation at both frontend and backend to prevent XSS attacks and ensure data integrity
+
+### Database & Storage
+- **SQLite** - Lightweight relational database for persistent data storage
+
+### Architecture
+- **RESTful API** - Full CRUD operations for user management with standardized HTTP methods
