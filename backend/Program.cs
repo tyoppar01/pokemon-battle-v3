@@ -1,6 +1,10 @@
 using PokemonBattle.Services;
 using PokemonBattle.Data;
 using Microsoft.EntityFrameworkCore;
+using DotNetEnv;
+
+// Load environment variables from .env file
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,37 +14,33 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Configure SQLite Database
+var databasePath = Environment.GetEnvironmentVariable("DATABASE_PATH") ?? "Databases/pokemon_battle.db";
 builder.Services.AddDbContext<PokemonDbContext>(options =>
-    options.UseSqlite("Data Source=Databases/pokemon_battle.db"));
+    options.UseSqlite($"Data Source={databasePath}"));
 
 // Register custom services
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PokemonService>();
 
 // Configure CORS for frontend
+var corsOrigins = Environment.GetEnvironmentVariable("CORS_ORIGINS")?.Split(',') 
+    ?? new[] { "http://localhost:8080" };
+
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowFrontend", policy => {
-        policy.WithOrigins(
-            "http://localhost:8000", 
-            "http://127.0.0.1:8000", 
-            "http://localhost:5500", 
-            "http://127.0.0.1:5500",
-            "http://localhost:5050",
-            "http://127.0.0.1:5050",
-            "http://localhost:8080",
-            "http://127.0.0.1:8080"
-        )
-        .AllowAnyMethod()
-        .AllowAnyHeader();
+        policy.WithOrigins(corsOrigins)
+              .AllowAnyMethod()
+              .AllowAnyHeader();
     });
 });
 
 var app = builder.Build();
 
 // Ensure Databases directory exists
-if (!Directory.Exists("Databases")) {
-    Directory.CreateDirectory("Databases");
-    Console.WriteLine("Created Databases directory");
+var dbDirectory = Path.GetDirectoryName(databasePath);
+if (!string.IsNullOrEmpty(dbDirectory) && !Directory.Exists(dbDirectory)) {
+    Directory.CreateDirectory(dbDirectory);
+    Console.WriteLine($"Created directory: {dbDirectory}");
 }
 
 // Initialize database and seed data
