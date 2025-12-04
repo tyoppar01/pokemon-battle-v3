@@ -405,8 +405,8 @@ body {
     width: 200px;
     height: 200px;
     object-fit: contain;
-    image-rendering: pixelated;
     margin-bottom: 15px;
+    background-color: transparent;
 }
 
 .pokemon-stats {
