@@ -145,7 +145,6 @@ export class BattleHandler {
         const playerName = playerNumber === 1 ? this.app.battle.player1.name : this.app.battle.player2.name;
         
         this.app.soundManager.playError();
-        alert(`${playerName}'s Pokemon fainted! Choose your next Pokemon!`);
         
         this.app.currentAvailablePokemon = availablePokemon;
         this.app.currentSwitchingPlayer = playerNumber;

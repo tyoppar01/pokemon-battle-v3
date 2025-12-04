@@ -4,7 +4,7 @@
 import { PokemonSprites } from '../helpers/pokemonSprites.js';
 
 export class BattleUI {
-    
+
     /**
      * Show battle screen
      */
@@ -50,19 +50,15 @@ export class BattleUI {
         const hpText = document.getElementById(`battlePlayer${playerNum}HP`);
         const hpBar = document.getElementById(`battlePlayer${playerNum}HealthBar`);
 
-        const hpPercent = (pokemon.currentHitPoint / pokemon.maxHitPoint) * 100;
+        // Clamp HP to 0 minimum
+        const currentHP = Math.max(0, pokemon.currentHitPoint);
+        const hpPercent = (currentHP / pokemon.maxHitPoint) * 100;
         
-        hpText.textContent = `HP: ${pokemon.currentHitPoint}/${pokemon.maxHitPoint}`;
+        hpText.textContent = `HP: ${currentHP}/${pokemon.maxHitPoint}`;
         hpBar.style.width = `${hpPercent}%`;
 
         // Color based on HP percentage
-        if (hpPercent > 50) {
-            hpBar.style.backgroundColor = '#00ff00';
-        } else if (hpPercent > 25) {
-            hpBar.style.backgroundColor = '#ffff00';
-        } else {
-            hpBar.style.backgroundColor = '#ff0000';
-        }
+        hpBar.style.backgroundColor = hpPercent > 50 ? '#00ff00' : hpPercent > 25 ? '#ffff00' : '#ff0000';
     }
 
     /**
@@ -108,11 +104,7 @@ export class BattleUI {
 
         // Hide back button if forced switch
         const backButton = document.querySelector('#pokemonSwitchMenu [data-action="back"]');
-        if (isForced) {
-            backButton.style.display = 'none';
-        } else {
-            backButton.style.display = 'block';
-        }
+        backButton.style.display = isForced ? 'none' : 'block';
     }
 
     /**
