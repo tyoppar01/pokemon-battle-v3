@@ -8,6 +8,12 @@ export class UserUI {
     static showSelectPlayers() {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('selectPlayersScreen').classList.add('active');
+        
+        // Reset selections and clear previews
+        document.getElementById('player1Select').value = '';
+        document.getElementById('player2Select').value = '';
+        document.getElementById('player1Preview').innerHTML = '<p style="color: #666;">Select a trainer to see their team</p>';
+        document.getElementById('player2Preview').innerHTML = '<p style="color: #666;">Select a trainer to see their team</p>';
     }
 
     /**
@@ -78,6 +84,9 @@ export class UserUI {
      */
     static showPlayerPreview(playerNum, user) {
         const preview = document.getElementById(`player${playerNum}Preview`);
+        
+        // Always clear the preview first
+        preview.innerHTML = '';
         
         if (!user || !user.pokemon || user.pokemon.length === 0) {
             preview.innerHTML = '<p style="color: #666;">No Pokemon available</p>';

@@ -147,10 +147,17 @@ class BattleApp {
         }
 
         try {
+            // Find user from the loaded users list
             const user = this.users.find(u => u.id === userId);
-            UserUI.showPlayerPreview(playerNum, user);
+            if (user) {
+                UserUI.showPlayerPreview(playerNum, user);
+            } else {
+                // If user not found, clear preview
+                UserUI.showPlayerPreview(playerNum, null);
+            }
         } catch (error) {
             console.error('Error loading Pokemon:', error);
+            UserUI.showPlayerPreview(playerNum, null);
         }
     }
 
