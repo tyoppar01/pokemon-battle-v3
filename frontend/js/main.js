@@ -1,10 +1,10 @@
-import { Character } from './models.js';
+import { Character, Pokemon, Attack } from './models.js';
 import { PokeBattle } from './battle.js';
 import { APIService } from './api.js';
-import { PokemonSprites } from './pokemonSprites.js';
+import { MainMenuUI, BattleUI, UserUI, PokemonUI } from './components/index.js';
 
 /**
- * Main Application
+ * Main Application Controller
  */
 class BattleApp {
 
@@ -17,32 +17,10 @@ class BattleApp {
     }
 
     async init() {
-        this.showLogo();
+        MainMenuUI.showLogo();
         await this.loadUsers();
         this.attachEventListeners();
-        this.showScreen('mainMenu');
-    }
-
-    showLogo() {
-        const logo = `
-╔════════════════════════════════════════════════════════════════════╗
-║                                                                    ║
-║   ██████╗  ██████╗ ██╗  ██╗███████╗███╗   ███╗ ██████╗ ███╗   ██╗  ║
-║   ██╔══██╗██╔═══██╗██║ ██╔╝██╔════╝████╗ ████║██╔═══██╗████╗  ██║  ║
-║   ██████╔╝██║   ██║█████╔╝ █████╗  ██╔████╔██║██║   ██║██╔██╗ ██║  ║
-║   ██╔═══╝ ██║   ██║██╔═██╗ ██╔══╝  ██║╚██╔╝██║██║   ██║██║╚██╗██║  ║
-║   ██║     ╚██████╔╝██║  ██╗███████╗██║ ╚═╝ ██║╚██████╔╝██║ ╚████║  ║
-║   ╚═╝      ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═══╝  ║
-║                                                                    ║
-║   ██████╗  █████╗ ████████╗████████╗██╗     ███████╗               ║
-║   ██╔══██╗██╔══██╗╚══██╔══╝╚══██╔══╝██║     ██╔════╝               ║
-║   ██████╔╝███████║   ██║      ██║   ██║     █████╗                 ║
-║   ██╔══██╗██╔══██║   ██║      ██║   ██║     ██╔══╝                 ║
-║   ██████╔╝██║  ██║   ██║      ██║   ███████╗███████╗               ║
-║   ╚═════╝ ╚═╝  ╚═╝   ╚═╝      ╚═╝   ╚══════╝╚══════╝               ║
-║                                                                    ║
-╚════════════════════════════════════════════════════════════════════╝`;
-        document.getElementById('logoArt').textContent = logo;
+        MainMenuUI.show();
     }
 
     /**
@@ -51,28 +29,10 @@ class BattleApp {
     async loadUsers() {
         try {
             this.users = await this.apiService.getAllUsers();
-            this.populateUserSelects();
+            UserUI.populateUserSelects(this.users);
         } catch (error) {
             console.error('Failed to load users:', error);
         }
-    }
-
-    /**
-     * Populate the user selection dropdowns
-     */
-    populateUserSelects() {
-        const player1Select = document.getElementById('player1Select');
-        const player2Select = document.getElementById('player2Select');
-
-        [player1Select, player2Select].forEach(select => {
-            select.innerHTML = '<option value="">Select trainer...</option>';
-            this.users.forEach(user => {
-                const option = document.createElement('option');
-                option.value = user.id;
-                option.textContent = `${user.name} (${user.pokemon.length} Pokemon)`;
-                select.appendChild(option);
-            });
-        });
     }
 
     /**
@@ -81,12 +41,13 @@ class BattleApp {
     attachEventListeners() {
         // Main menu
         document.querySelectorAll('#mainMenu .menu-option').forEach(option => {
-            option.addEventListener('click', (e) => {
+            option.addEventListener('click', async (e) => {
                 const action = e.target.dataset.action;
-                if (action === 'selectPlayers') this.showSelectPlayersScreen();
+                console.log('Menu option clicked:', action);
+                if (action === 'selectPlayers') await this.showSelectPlayersScreen();
                 else if (action === 'createUser') this.showCreateUserScreen();
-                else if (action === 'viewUsers') this.showViewUsersScreen();
-                else if (action === 'viewPokemon') this.showViewPokemonScreen();
+                else if (action === 'viewUsers') await this.showViewUsersScreen();
+                else if (action === 'viewPokemon') await this.showViewPokemonScreen();
             });
         });
 
@@ -94,20 +55,20 @@ class BattleApp {
         document.getElementById('player1Select').addEventListener('change', () => this.showPlayerPreview(1));
         document.getElementById('player2Select').addEventListener('change', () => this.showPlayerPreview(2));
         document.getElementById('confirmBattleBtn').addEventListener('click', () => this.startBattle());
-        document.getElementById('backToMainBtn').addEventListener('click', () => this.showScreen('mainMenu'));
+        document.getElementById('backToMainBtn').addEventListener('click', () => MainMenuUI.show());
 
         // Create user screen
         document.querySelectorAll('.pokemon-option').forEach(option => {
             option.addEventListener('click', (e) => this.togglePokemonSelection(e.target));
         });
         document.getElementById('saveTrainerBtn').addEventListener('click', () => this.createTrainer());
-        document.getElementById('cancelCreateBtn').addEventListener('click', () => this.showScreen('mainMenu'));
+        document.getElementById('cancelCreateBtn').addEventListener('click', () => MainMenuUI.show());
 
         // View users screen
-        document.getElementById('backFromUsersBtn').addEventListener('click', () => this.showScreen('mainMenu'));
+        document.getElementById('backFromUsersBtn').addEventListener('click', () => MainMenuUI.show());
 
         // View Pokemon screen
-        document.getElementById('backFromPokemonBtn').addEventListener('click', () => this.showScreen('mainMenu'));
+        document.getElementById('backFromPokemonBtn').addEventListener('click', () => MainMenuUI.show());
 
         // Battle screen
         document.querySelectorAll('#battleActionsMenu .menu-option').forEach(option => {
@@ -129,18 +90,47 @@ class BattleApp {
         });
     }
 
-    // Show a specific screen by ID
-    showScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-    }
-
     /**
      * Show the select players screen
      */
     async showSelectPlayersScreen() {
         await this.loadUsers();
-        this.showScreen('selectPlayersScreen');
+        UserUI.showSelectPlayers();
+    }
+
+    /**
+     * Show the create user screen
+     */
+    showCreateUserScreen() {
+        this.selectedTeam = [];
+        UserUI.showCreateUser();
+    }
+
+    /**
+     * Show view users screen
+     */
+    async showViewUsersScreen() {
+        console.log('showViewUsersScreen called');
+        await this.loadUsers();
+        console.log('Users loaded:', this.users);
+        UserUI.showViewUsers(this.users);
+        console.log('UserUI.showViewUsers called');
+    }
+
+    /**
+     * Show view Pokemon screen
+     */
+    async showViewPokemonScreen() {
+        console.log('showViewPokemonScreen called');
+        try {
+            const allPokemon = await this.apiService.getAllPlayablePokemon();
+            console.log('Pokemon loaded:', allPokemon);
+            await PokemonUI.show(allPokemon);
+            console.log('PokemonUI.show called');
+        } catch (error) {
+            console.error('Failed to load Pokemon:', error);
+            await PokemonUI.show([]);
+        }
     }
 
     /**
@@ -149,38 +139,19 @@ class BattleApp {
      */
     async showPlayerPreview(playerNum) {
         const select = document.getElementById(`player${playerNum}Select`);
-        const preview = document.getElementById(`player${playerNum}Preview`);
         const userId = select.value;
 
         if (!userId) {
-            preview.innerHTML = '<p style="color: #666;">Select a trainer...</p>';
+            UserUI.showPlayerPreview(playerNum, null);
             return;
         }
 
         try {
-            const pokemon = await this.apiService.getUserPokemon(userId);
             const user = this.users.find(u => u.id === userId);
-            
-            preview.innerHTML = `
-                <div class="trainer-name">${user.name}</div>
-                <div class="pokemon-count">${pokemon.length} Pokemon in team</div>
-                ${pokemon.map((p, i) => `<div class="pokemon-item">  ${i + 1}. ${p.name} (${p.type})</div>`).join('')}
-            `;
+            UserUI.showPlayerPreview(playerNum, user);
         } catch (error) {
-            preview.innerHTML = '<p style="color: #ff0000;">Error loading Pokemon</p>';
+            console.error('Error loading Pokemon:', error);
         }
-    }
-
-    /**
-     * Show the create user screen
-     */
-    showCreateUserScreen() {
-        this.selectedTeam = [];
-        document.getElementById('newTrainerName').value = '';
-        document.getElementById('teamDisplay').innerHTML = '<p style="color: #666;">No Pokemon selected yet</p>';
-        document.getElementById('teamCounter').textContent = '0';
-        document.querySelectorAll('.pokemon-option').forEach(opt => opt.classList.remove('selected'));
-        this.showScreen('createUserScreen');
     }
 
     /**
@@ -204,27 +175,7 @@ class BattleApp {
             this.selectedTeam.push(pokemonName);
         }
 
-        this.updateTeamDisplay();
-    }
-
-    /**
-     * Update the selected team display
-     */
-    updateTeamDisplay() {
-        const teamDisplay = document.getElementById('teamDisplay');
-        const teamCounter = document.getElementById('teamCounter');
-
-        teamCounter.textContent = this.selectedTeam.length;
-
-        if (this.selectedTeam.length === 0) {
-            teamDisplay.innerHTML = '<p style="color: #666;">No Pokemon selected yet</p>';
-        } else {
-            teamDisplay.innerHTML = this.selectedTeam.map((pokemon, i) => `
-                <div class="team-item">
-                    <span>${i + 1}. ${pokemon}</span>
-                </div>
-            `).join('');
-        }
+        UserUI.updateTeamDisplay(this.selectedTeam);
     }
 
     /**     
@@ -255,75 +206,11 @@ class BattleApp {
 
             alert(`Trainer ${name} created successfully with ${this.selectedTeam.length} Pokemon!`);
             await this.loadUsers();
-            this.showScreen('mainMenu');
+            MainMenuUI.show();
         } catch (error) {
             alert('Failed to create trainer. Please try again.');
             console.error(error);
         }
-    }
-
-    /**     
-     * Show all trainers and their Pokemon
-     */
-    async showViewUsersScreen() {
-        const usersList = document.getElementById('usersList');
-        
-        if (this.users.length === 0) {
-            usersList.innerHTML = '<p style="color: #666; text-align: center; padding: 40px;">No trainers found. Create one first!</p>';
-        } else {
-            usersList.innerHTML = this.users.map(user => `
-                <div class="user-card">
-                    <div class="user-header">${user.name}</div>
-                    <div class="user-gender">Gender: ${user.gender}</div>
-                    <div class="pokemon-list">
-                        <div style="color: #ffff00; margin-bottom: 10px;">Pokemon Team (${user.pokemon.length}):</div>
-                        ${user.pokemon.map((p, i) => `
-                            <div class="pokemon-item">  ✓ ${p.name} (${p.type}) - Level ${p.level}</div>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        this.showScreen('viewUsersScreen');
-    }
-
-    /**     
-     * Show all available Pokemon
-     */
-    async showViewPokemonScreen() {
-        const pokemonList = document.getElementById('pokemonList');
-        
-        try {
-            const allPokemon = await this.apiService.getAllPlayablePokemon();
-            
-            if (allPokemon.length === 0) {
-                pokemonList.innerHTML = '<p style="color: #666; text-align: center; padding: 40px;">No Pokemon available.</p>';
-            } else {
-                pokemonList.innerHTML = allPokemon.map((pokemon, index) => `
-                    <div class="pokemon-card">
-                        <div class="pokemon-header">${index + 1}. ${pokemon.name}</div>
-                        <div class="pokemon-type">Type: ${pokemon.type}</div>
-                        <div class="pokemon-stats">
-                            <div class="stat-row">HP: ${pokemon.baseMaxHP}</div>
-                            <div class="stat-row">Attack: ${pokemon.baseAttack}</div>
-                            <div class="stat-row">Defense: ${pokemon.baseDefense}</div>
-                            <div class="stat-row">Speed: ${pokemon.baseSpeed}</div>
-                        </div>
-                        <div class="pokemon-attacks">
-                            <div class="attack-label">Attacks:</div>
-                            <div class="attack-item">• ${pokemon.normalAttack}</div>
-                            <div class="attack-item special">• ${pokemon.specialAttack}</div>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        } catch (error) {
-            console.error('Failed to load Pokemon:', error);
-            pokemonList.innerHTML = '<p style="color: #ff0000; text-align: center; padding: 40px;">Failed to load Pokemon data.</p>';
-        }
-
-        this.showScreen('viewPokemonScreen');
     }
 
     /**     
@@ -356,22 +243,41 @@ class BattleApp {
                 return;
             }
 
+            // Transform API Pokemon data to frontend Pokemon model
+            const createPokemonFromAPI = (apiPokemon) => {
+                const pokemon = new Pokemon(
+                    apiPokemon.name,
+                    apiPokemon.type,
+                    apiPokemon.level,
+                    apiPokemon.maxHitPoint,
+                    apiPokemon.attack,
+                    apiPokemon.defense,
+                    apiPokemon.speed
+                );
+                pokemon.currentHitPoint = apiPokemon.currentHitPoint;
+                // Set special attack if available
+                if (apiPokemon.specialSkill && apiPokemon.specialSkill !== 'Unknown') {
+                    pokemon.specialAttack = new Attack(apiPokemon.specialSkill, 60);
+                }
+                return pokemon;
+            };
+
             // Create characters with Pokemon data from backend
             const player1 = new Character(user1.name, user1.gender);
-            player1.addPokemon(pokemon1List[0]);
+            player1.addPokemon(createPokemonFromAPI(pokemon1List[0]));
 
             const player2 = new Character(user2.name, user2.gender);
-            player2.addPokemon(pokemon2List[0]);
+            player2.addPokemon(createPokemonFromAPI(pokemon2List[0]));
 
             // Initialize battle
             this.battle = new PokeBattle(player1, player2);
             this.battle.start();
 
             // Setup battle UI
-            this.showScreen('battleScreen');
-            this.updateBattleDisplay();
-            this.showBattleActions();
-            this.updateBattleLog();
+            BattleUI.show();
+            BattleUI.updateDisplay(this.battle.activePokemon1, this.battle.activePokemon2);
+            BattleUI.showActionsMenu();
+            BattleUI.updateLog(this.battle.getBattleLog());
 
         } catch (error) {
             alert('Failed to start battle. Please try again.');
@@ -380,68 +286,17 @@ class BattleApp {
     }
 
     /**     
-     * Update the battle display with current Pokemon info
-     */
-    updateBattleDisplay() {
-        if (!this.battle) return;
-
-        const p1 = this.battle.activePokemon1;
-        const p2 = this.battle.activePokemon2;
-
-        // Update sprites
-        document.getElementById('battlePlayer1Sprite').src = PokemonSprites.getSpriteUrl(p1.name);
-        document.getElementById('battlePlayer2Sprite').src = PokemonSprites.getSpriteUrl(p2.name);
-
-        // Update names
-        document.getElementById('battlePlayer1Name').textContent = `${this.battle.player1.name}'s ${p1.name}`;
-        document.getElementById('battlePlayer2Name').textContent = `${this.battle.player2.name}'s ${p2.name}`;
-
-        // Update HP
-        this.updateHealthBar(1, p1);
-        this.updateHealthBar(2, p2);
-
-        // Update attack options
-        document.getElementById('normalAttackOption').textContent = `1. ${p1.normalAttack.name}`;
-        document.getElementById('specialAttackOption').textContent = `2. ${p1.specialAttack.name}`;
-    }
-
-    /**     
-     * Update health bar for a player
-     * @param {number} playerNum 
-     * @param {Pokemon} pokemon 
-     */
-    updateHealthBar(playerNum, pokemon) {
-        const hpText = document.getElementById(`battlePlayer${playerNum}HP`);
-        const hpBar = document.getElementById(`battlePlayer${playerNum}HealthBar`);
-
-        const hpPercent = (pokemon.currentHitPoint / pokemon.maxHitPoint) * 100;
-        
-        hpText.textContent = `HP: ${pokemon.currentHitPoint}/${pokemon.maxHitPoint}`;
-        hpBar.style.width = `${hpPercent}%`;
-
-        // Color coding
-        hpBar.classList.remove('low', 'critical');
-        if (hpPercent < 20) {
-            hpBar.classList.add('critical');
-        } else if (hpPercent < 50) {
-            hpBar.classList.add('low');
-        }
-    }
-
-    /**     
      * Show battle action menu
      */
     showBattleActions() {
-        document.getElementById('battleActionsMenu').classList.remove('hidden');
-        document.getElementById('fightMenu').classList.add('hidden');
+        BattleUI.showActionsMenu();
     }
 
     /**     
      * Show fight menu
      */
     showFightMenu() {
-        document.getElementById('battleActionsMenu').classList.add('hidden');
-        document.getElementById('fightMenu').classList.remove('hidden');
+        BattleUI.showFightMenu();
     }
 
     /**     
@@ -454,35 +309,20 @@ class BattleApp {
         const result = this.battle.performAttack(isSpecial);
         
         if (result.success) {
-            this.updateBattleDisplay();
-            this.updateBattleLog();
+            BattleUI.updateDisplay(this.battle.activePokemon1, this.battle.activePokemon2);
+            BattleUI.updateLog(this.battle.getBattleLog());
             
             // Check if battle ended
             if (this.battle.getStatus() !== 'InProgress') {
                 setTimeout(() => {
                     const winner = this.battle.getStatus() === 'Player1Won' ? this.battle.player1.name : this.battle.player2.name;
                     alert(`🏆 ${winner} wins the battle!`);
-                    this.showScreen('mainMenu');
+                    MainMenuUI.show();
                 }, 1000);
             } else {
-                this.showBattleActions();
+                BattleUI.showActionsMenu();
             }
         }
-    }
-
-    /**     
-     * Update the battle log display
-     */
-    updateBattleLog() {
-        const logContainer = document.getElementById('battleLogTerminal');
-        const logs = this.battle.getBattleLog();
-
-        logContainer.innerHTML = logs.map(log => 
-            `<div class="log-entry ${log.type}">${log.message}</div>`
-        ).join('');
-
-        // Auto-scroll to bottom
-        logContainer.scrollTop = logContainer.scrollHeight;
     }
 }
 
