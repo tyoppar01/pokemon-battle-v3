@@ -2,6 +2,9 @@ using PokemonBattle.Services;
 using PokemonBattle.Data;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 // Load environment variables from .env file
 Env.Load();
@@ -10,17 +13,40 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 // Configure SQLite Database
 var databasePath = Environment.GetEnvironmentVariable("DATABASE_PATH") ?? "Databases/pokemon_battle.db";
 builder.Services.AddDbContext<PokemonDbContext>(options =>
     options.UseSqlite($"Data Source={databasePath}"));
 
+// Configure JWT Authentication
+var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not configured");
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "PokemonBattleAPI";
+var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "PokemonBattleClient";
+var jwtExpiryMinutes = int.Parse(builder.Configuration["Jwt:ExpiryMinutes"] ?? "60");
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 // Register custom services
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PokemonService>();
+builder.Services.AddSingleton(new JwtService(jwtKey, jwtIssuer, jwtAudience, jwtExpiryMinutes));
 
 // Configure CORS for frontend
 var corsOrigins = Environment.GetEnvironmentVariable("CORS_ORIGINS")?.Split(',') 
@@ -52,12 +78,8 @@ using (var scope = app.Services.CreateScope()) {
 }
 
 // Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment()) {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
 app.UseCors("AllowFrontend");
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
