@@ -19,6 +19,16 @@ namespace PokemonBattle.Controllers {
                 return BadRequest(new { error = "Name is required" });
             }
 
+            // Validation: Name length (3-20 characters)
+            if (request.Name.Length < 3 || request.Name.Length > 20) {
+                return BadRequest(new { error = "Name must be between 3 and 20 characters" });
+            }
+
+            // Validation: Only alphanumeric and spaces allowed
+            if (!System.Text.RegularExpressions.Regex.IsMatch(request.Name, @"^[a-zA-Z0-9 ]+$")) {
+                return BadRequest(new { error = "Name can only contain letters, numbers, and spaces" });
+            }
+
             string userId = _userService.CreateUser(request.Name, request.Gender ?? "Unknown");
             var user = _userService.GetUser(userId);
 
@@ -60,6 +70,16 @@ namespace PokemonBattle.Controllers {
         public IActionResult UpdateUser(string id, [FromBody] CreateUserRequest request) {
             if (string.IsNullOrWhiteSpace(request.Name)) {
                 return BadRequest(new { error = "Name is required" });
+            }
+
+            // Validation: Name length (3-20 characters)
+            if (request.Name.Length < 3 || request.Name.Length > 20) {
+                return BadRequest(new { error = "Name must be between 3 and 20 characters" });
+            }
+
+            // Validation: Only alphanumeric and spaces allowed
+            if (!System.Text.RegularExpressions.Regex.IsMatch(request.Name, @"^[a-zA-Z0-9 ]+$")) {
+                return BadRequest(new { error = "Name can only contain letters, numbers, and spaces" });
             }
 
             bool updated = _userService.UpdateUser(id, request.Name, request.Gender ?? "Unknown");
