@@ -115,6 +115,44 @@ class BattleApp {
         console.log('Users loaded:', this.users);
         UserUI.showViewUsers(this.users);
         console.log('UserUI.showViewUsers called');
+        
+        // Attach delete button listeners
+        this.attachDeleteUserListeners();
+    }
+
+    /**
+     * Attach event listeners to delete user buttons
+     */
+    attachDeleteUserListeners() {
+        document.querySelectorAll('.delete-user-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const userId = e.target.dataset.userId;
+                await this.deleteUser(userId);
+            });
+        });
+    }
+
+    /**
+     * Delete a user
+     * @param {string} userId 
+     */
+    async deleteUser(userId) {
+        const user = this.users.find(u => u.id === userId);
+        if (!user) return;
+        
+        const confirmed = confirm(`Are you sure you want to delete trainer "${user.name}"? This cannot be undone.`);
+        if (!confirmed) return;
+        
+        try {
+            await this.apiService.deleteUser(userId);
+            alert(`✓ Trainer "${user.name}" has been deleted!`);
+            // Refresh the users list
+            await this.showViewUsersScreen();
+        } catch (error) {
+            console.error('Failed to delete user:', error);
+            alert('✗ Failed to delete trainer. Please try again.');
+        }
     }
 
     /**
@@ -313,7 +351,9 @@ class BattleApp {
     executeAttack(isSpecial) {
         if (!this.battle) return;
 
-        const result = this.battle.performAttack(isSpecial);
+        const result = isSpecial 
+            ? this.battle.useSpecialAttack()
+            : this.battle.attack();
         
         if (result.success) {
             BattleUI.updateDisplay(this.battle.activePokemon1, this.battle.activePokemon2);

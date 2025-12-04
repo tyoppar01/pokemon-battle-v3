@@ -44,7 +44,8 @@ export class UserUI {
             usersList.innerHTML = '<p style="color: #666; text-align: center; padding: 40px;">No trainers found. Create one first!</p>';
         } else {
             usersList.innerHTML = users.map(user => `
-                <div class="user-card">
+                <div class="user-card" data-user-id="${user.id}">
+                    <button class="delete-user-btn" data-user-id="${user.id}" title="Delete Trainer">✕</button>
                     <div class="user-header">${user.name}</div>
                     <div class="user-gender">Gender: ${user.gender}</div>
                     <div class="pokemon-list">

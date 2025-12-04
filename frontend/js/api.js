@@ -113,4 +113,49 @@ class APIService {
         }
     }
 
+    /**
+     * Delete a user
+     * @param {string} userId 
+     * @returns {Promise<void>}
+     */
+    async deleteUser(userId) {
+
+        try {
+            const response = await fetch(`${this.baseURL}/${userId}`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) throw new Error('Failed to delete user');
+
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Update a user
+     * @param {string} userId 
+     * @param {string} name 
+     * @param {string} gender 
+     * @returns {Promise<Object>} Updated user object
+     */
+    async updateUser(userId, name, gender) {
+
+        try {
+            const response = await fetch(`${this.baseURL}/${userId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, gender })
+            });
+
+            if (!response.ok) throw new Error('Failed to update user');
+            return await response.json();
+
+        } catch (error) {
+            console.error('Error updating user:', error);
+            throw error;
+        }
+    }
+
 }
