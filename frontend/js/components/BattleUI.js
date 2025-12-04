@@ -23,8 +23,8 @@ export class BattleUI {
         document.getElementById('battlePlayer2Name').textContent = pokemon2.name;
 
         // Update sprites
-        document.getElementById('battlePlayer1Sprite').src = PokemonSprites.getSprite(pokemon1.name);
-        document.getElementById('battlePlayer2Sprite').src = PokemonSprites.getSprite(pokemon2.name);
+        document.getElementById('battlePlayer1Sprite').src = PokemonSprites.getSpriteUrl(pokemon1.name);
+        document.getElementById('battlePlayer2Sprite').src = PokemonSprites.getSpriteUrl(pokemon2.name);
 
         // Update HP
         this.updateHealthBar(1, pokemon1);
