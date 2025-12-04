@@ -1,0 +1,10 @@
+.DS_Store
+dist/
+.env
+.vscode/
+.idea/
+*.log
+coverage/
+*.tmp
+*.bak
+Thumbs.db
