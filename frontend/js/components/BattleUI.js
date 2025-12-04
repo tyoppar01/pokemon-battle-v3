@@ -1,7 +1,7 @@
 /**
  * UI Component - Battle Screen
  */
-import { PokemonSprites } from '../pokemonSprites.js';
+import { PokemonSprites } from '../helpers/pokemonSprites.js';
 
 export class BattleUI {
     /**
