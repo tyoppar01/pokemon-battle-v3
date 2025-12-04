@@ -11,3 +11,8 @@ bin/
 *.userosscache
 *.sln.docstates
 *.DS_Store
+
+Databases/
+*.db
+*.db-shm
+*.db-wal
