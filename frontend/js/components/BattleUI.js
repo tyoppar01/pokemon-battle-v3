@@ -65,6 +65,7 @@ export class BattleUI {
     static showActionsMenu() {
         document.getElementById('battleActionsMenu').classList.remove('hidden');
         document.getElementById('fightMenu').classList.add('hidden');
+        document.getElementById('pokemonSwitchMenu').classList.add('hidden');
     }
 
     /**
@@ -73,6 +74,39 @@ export class BattleUI {
     static showFightMenu() {
         document.getElementById('battleActionsMenu').classList.add('hidden');
         document.getElementById('fightMenu').classList.remove('hidden');
+        document.getElementById('pokemonSwitchMenu').classList.add('hidden');
+    }
+
+    /**
+     * Show Pokemon switch menu
+     * @param {Array} availablePokemon - List of Pokemon available to switch
+     * @param {boolean} isForced - Whether this is a forced switch (Pokemon fainted)
+     */
+    static showPokemonSwitchMenu(availablePokemon, isForced = false) {
+        document.getElementById('battleActionsMenu').classList.add('hidden');
+        document.getElementById('fightMenu').classList.add('hidden');
+        document.getElementById('pokemonSwitchMenu').classList.remove('hidden');
+
+        const switchList = document.getElementById('pokemonSwitchList');
+        const header = document.querySelector('#pokemonSwitchMenu .menu-header');
+        
+        // Update header based on forced or voluntary switch
+        header.textContent = isForced ? 'CHOOSE NEXT POKEMON!' : 'SWITCH POKEMON';
+        
+        // Populate Pokemon list
+        switchList.innerHTML = availablePokemon.map((pokemon, index) => `
+            <div class="menu-option" data-pokemon-index="${index}">
+                ${index + 1}. ${pokemon.name} (HP: ${pokemon.currentHitPoint}/${pokemon.maxHitPoint})
+            </div>
+        `).join('');
+
+        // Hide back button if forced switch
+        const backButton = document.querySelector('#pokemonSwitchMenu [data-action="back"]');
+        if (isForced) {
+            backButton.style.display = 'none';
+        } else {
+            backButton.style.display = 'block';
+        }
     }
 
     /**

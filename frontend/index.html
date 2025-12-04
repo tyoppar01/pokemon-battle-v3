@@ -167,9 +167,23 @@
                     <div class="menu-header">BATTLE ACTIONS</div>
                     <div class="menu-options">
                         <div class="menu-option" data-action="fight">1. FIGHT</div>
-                        <div class="menu-option disabled" data-action="pokemon">2. POKEMON</div>
+                        <div class="menu-option" data-action="pokemon">2. POKEMON</div>
                     </div>
                     <div class="menu-footer">Choose action (1-2):</div>
+                </div>
+            </div>
+
+            <!-- Pokemon Switch Menu -->
+            <div id="pokemonSwitchMenu" class="battle-menu hidden">
+                <div class="menu-box small">
+                    <div class="menu-header">SWITCH POKEMON</div>
+                    <div id="pokemonSwitchList" class="menu-options">
+                        <!-- Populated dynamically -->
+                    </div>
+                    <div class="menu-options">
+                        <div class="menu-option secondary" data-action="back">B. ◄ Back</div>
+                    </div>
+                    <div class="menu-footer">Choose Pokemon to switch:</div>
                 </div>
             </div>
 

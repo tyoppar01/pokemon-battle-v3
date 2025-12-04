@@ -87,10 +87,24 @@ class PokeBattle {
 
         this.logAction(`${player.name} switched to ${newPokemon.name}!`);
         
-        // Switch turn if requested
+        // Switch turn if requested (only if not a forced switch due to fainting)
         if (changeTurn) {
             this.switchTurn();
         }
+    }
+
+    /**
+     * Check if current player needs to switch Pokemon (active Pokemon fainted)
+     * @returns {number|null} Player number that needs to switch, or null if none
+     */
+    needsForcedSwitch() {
+        if (this.isPokemonDefeated(this.activePokemon1) && this.hasAlivePokemon(this.player1.pokePockets)) {
+            return 1;
+        }
+        if (this.isPokemonDefeated(this.activePokemon2) && this.hasAlivePokemon(this.player2.pokePockets)) {
+            return 2;
+        }
+        return null;
     }
 
     /**

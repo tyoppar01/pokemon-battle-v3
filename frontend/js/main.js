@@ -15,6 +15,9 @@ class BattleApp {
         this.selectedTeam = [];
         this.battle = null;
         this.soundManager = soundManager;
+        this.currentAvailablePokemon = null;
+        this.currentSwitchingPlayer = null;
+        this.isForcedSwitch = false;
         this.init();
     }
 
@@ -78,6 +81,7 @@ class BattleApp {
             option.addEventListener('click', (e) => {
                 const action = e.target.dataset.action;
                 if (action === 'fight') this.showFightMenu();
+                else if (action === 'pokemon') this.showPokemonSwitchMenu();
             });
         });
 
@@ -90,6 +94,21 @@ class BattleApp {
                 else if (attack === 'special') this.executeAttack(true);
                 else if (action === 'back') this.showBattleActions();
             });
+        });
+
+        // Pokemon switch menu - delegate event listener for dynamic content
+        document.getElementById('pokemonSwitchMenu').addEventListener('click', (e) => {
+            const target = e.target.closest('.menu-option');
+            if (!target) return;
+
+            const pokemonIndex = target.dataset.pokemonIndex;
+            const action = target.dataset.action;
+
+            if (pokemonIndex !== undefined) {
+                this.switchPokemon(parseInt(pokemonIndex));
+            } else if (action === 'back') {
+                this.showBattleActions();
+            }
         });
     }
 
@@ -323,10 +342,16 @@ class BattleApp {
 
             // Create characters with Pokemon data from backend
             const player1 = new Character(user1.name, user1.gender);
-            player1.addPokemon(createPokemonFromAPI(pokemon1List[0]));
+            // Add ALL Pokemon from player 1's team
+            pokemon1List.forEach(apiPokemon => {
+                player1.addPokemon(createPokemonFromAPI(apiPokemon));
+            });
 
             const player2 = new Character(user2.name, user2.gender);
-            player2.addPokemon(createPokemonFromAPI(pokemon2List[0]));
+            // Add ALL Pokemon from player 2's team
+            pokemon2List.forEach(apiPokemon => {
+                player2.addPokemon(createPokemonFromAPI(apiPokemon));
+            });
 
             // Initialize battle
             this.battle = new PokeBattle(player1, player2);
@@ -359,6 +384,90 @@ class BattleApp {
     }
 
     /**
+     * Show Pokemon switch menu
+     */
+    showPokemonSwitchMenu() {
+        if (!this.battle) return;
+        
+        const availablePokemon = this.battle.getAvailablePokemon(this.battle.currentTurn);
+        
+        if (availablePokemon.length === 0) {
+            this.soundManager.playError();
+            alert('No other Pokemon available to switch!');
+            return;
+        }
+        
+        this.currentAvailablePokemon = availablePokemon;
+        BattleUI.showPokemonSwitchMenu(availablePokemon, false);
+    }
+
+    /**
+     * Show forced Pokemon switch menu (when active Pokemon faints)
+     * @param {number} playerNumber - Player who needs to switch
+     */
+    showForcedPokemonSwitch(playerNumber) {
+        if (!this.battle) return;
+        
+        const availablePokemon = this.battle.getAvailablePokemon(playerNumber);
+        const playerName = playerNumber === 1 ? this.battle.player1.name : this.battle.player2.name;
+        
+        this.soundManager.playError();
+        alert(`${playerName}'s Pokemon fainted! Choose your next Pokemon!`);
+        
+        this.currentAvailablePokemon = availablePokemon;
+        this.currentSwitchingPlayer = playerNumber;
+        this.isForcedSwitch = true;
+        
+        BattleUI.showPokemonSwitchMenu(availablePokemon, true);
+    }
+
+    /**
+     * Switch to a different Pokemon
+     * @param {number} pokemonIndex - Index in the available Pokemon list
+     */
+    switchPokemon(pokemonIndex) {
+        if (!this.battle || !this.currentAvailablePokemon) return;
+        
+        const selectedPokemon = this.currentAvailablePokemon[pokemonIndex];
+        if (!selectedPokemon) return;
+        
+        this.soundManager.playSelect();
+        
+        // Determine which player is switching
+        const playerNumber = this.isForcedSwitch ? this.currentSwitchingPlayer : this.battle.currentTurn;
+        
+        // Perform the switch - don't change turn if it's a forced switch
+        const shouldChangeTurn = !this.isForcedSwitch;
+        this.battle.switchPokemon(playerNumber, selectedPokemon, shouldChangeTurn);
+        
+        // Update display
+        BattleUI.updateDisplay(this.battle.activePokemon1, this.battle.activePokemon2);
+        BattleUI.updateLog(this.battle.getBattleLog());
+        
+        // Reset switch state
+        this.currentAvailablePokemon = null;
+        this.currentSwitchingPlayer = null;
+        this.isForcedSwitch = false;
+        
+        // Check if battle ended or if another forced switch is needed
+        if (this.battle.getStatus() !== 'InProgress') {
+            setTimeout(() => {
+                const winner = this.battle.getStatus() === 'Player1Won' ? this.battle.player1.name : this.battle.player2.name;
+                alert(`🏆 ${winner} wins the battle!`);
+                MainMenuUI.show();
+            }, 1000);
+        } else {
+            // Check if a forced switch is needed
+            const needsSwitch = this.battle.needsForcedSwitch();
+            if (needsSwitch) {
+                setTimeout(() => this.showForcedPokemonSwitch(needsSwitch), 500);
+            } else {
+                BattleUI.showActionsMenu();
+            }
+        }
+    }
+
+    /**
      * Execute an attack
      * @param {boolean} isSpecial 
      */
@@ -387,7 +496,13 @@ class BattleApp {
                     MainMenuUI.show();
                 }, 1000);
             } else {
-                BattleUI.showActionsMenu();
+                // Check if a forced switch is needed (Pokemon fainted)
+                const needsSwitch = this.battle.needsForcedSwitch();
+                if (needsSwitch) {
+                    setTimeout(() => this.showForcedPokemonSwitch(needsSwitch), 500);
+                } else {
+                    BattleUI.showActionsMenu();
+                }
             }
         }
     }    /**
@@ -413,7 +528,7 @@ class BattleApp {
 
         // Add sounds to delete buttons
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('delete-user-btn')) {
+            if (e.target && e.target.classList && e.target.classList.contains('delete-user-btn')) {
                 this.soundManager.playCancel();
             }
         });
@@ -430,7 +545,7 @@ class BattleApp {
 
         // Add hover sounds to user cards
         document.addEventListener('mouseenter', (e) => {
-            if (e.target.classList.contains('user-card')) {
+            if (e.target && e.target.classList && e.target.classList.contains('user-card')) {
                 this.soundManager.playHover();
             }
         }, true);
