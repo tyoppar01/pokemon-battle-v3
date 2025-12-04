@@ -1,3 +1,13 @@
 obj
 bin
 BattleLogs
+DS_Store
+.env
+.vscode
+obj/
+bin/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.DS_Store
