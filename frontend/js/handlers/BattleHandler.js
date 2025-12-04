@@ -104,6 +104,15 @@ export class BattleHandler {
      * Show fight menu
      */
     showFightMenu() {
+        if (!this.app.battle) return;
+        
+        // Get the current player's active Pokemon
+        const currentPokemon = this.app.battle.currentTurn === 1 
+            ? this.app.battle.activePokemon1 
+            : this.app.battle.activePokemon2;
+        
+        // Update fight menu with current Pokemon's attacks
+        BattleUI.updateFightMenu(currentPokemon);
         BattleUI.showFightMenu();
     }
 
@@ -163,6 +172,12 @@ export class BattleHandler {
         // Perform the switch - don't change turn if it's a forced switch
         const shouldChangeTurn = !this.app.isForcedSwitch;
         this.app.battle.switchPokemon(playerNumber, selectedPokemon, shouldChangeTurn);
+        
+        // If this was a forced switch, set the turn to the player who just switched
+        // This ensures the player who switched gets to attack, not the opponent
+        if (this.app.isForcedSwitch) {
+            this.app.battle.setTurnAfterForcedSwitch(playerNumber);
+        }
         
         // Update display
         BattleUI.updateDisplay(this.app.battle.activePokemon1, this.app.battle.activePokemon2);

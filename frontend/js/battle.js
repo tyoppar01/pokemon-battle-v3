@@ -108,6 +108,15 @@ class PokeBattle {
     }
 
     /**
+     * Handle post-switch turn management for forced switches
+     * After a forced switch, ensure turn is set to the player who just switched
+     * @param {number} playerNumber - Player who just switched
+     */
+    setTurnAfterForcedSwitch(playerNumber) {
+        this.currentTurn = playerNumber;
+    }
+
+    /**
      * Get available Pokemon for switching (alive Pokemon that aren't active)
      * @param {number} playerNumber - Player number (1 or 2)
      * @returns {Array} Array of available Pokemon

@@ -67,6 +67,18 @@ body {
     margin: 20px 0;
 }
 
+.menu-options.grid-2x2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.menu-options.grid-3x2 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
 .menu-option {
     padding: 15px 20px;
     margin: 10px 0;
@@ -75,6 +87,15 @@ body {
     cursor: pointer;
     transition: all 0.2s;
     font-size: 18px;
+}
+
+.grid-2x2 .menu-option,
+.grid-3x2 .menu-option {
+    margin: 0;
+}
+
+.grid-2x2 .menu-option:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
 }
 
 .menu-option:hover:not(.disabled) {

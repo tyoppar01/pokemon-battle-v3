@@ -165,9 +165,11 @@
             <div id="battleActionsMenu" class="battle-menu">
                 <div class="menu-box small">
                     <div class="menu-header">BATTLE ACTIONS</div>
-                    <div class="menu-options">
+                    <div class="menu-options grid-2x2">
                         <div class="menu-option" data-action="fight">1. FIGHT</div>
                         <div class="menu-option" data-action="pokemon">2. POKEMON</div>
+                        <div class="menu-option disabled" data-action="items">3. ITEMS</div>
+                        <div class="menu-option disabled" data-action="run">4. RUN</div>
                     </div>
                     <div class="menu-footer">Choose action (1-2):</div>
                 </div>
@@ -177,7 +179,7 @@
             <div id="pokemonSwitchMenu" class="battle-menu hidden">
                 <div class="menu-box small">
                     <div class="menu-header">SWITCH POKEMON</div>
-                    <div id="pokemonSwitchList" class="menu-options">
+                    <div id="pokemonSwitchList" class="menu-options grid-3x2">
                         <!-- Populated dynamically -->
                     </div>
                     <div class="menu-options">
@@ -191,7 +193,7 @@
             <div id="fightMenu" class="battle-menu hidden">
                 <div class="menu-box small">
                     <div class="menu-header">FIGHT MENU</div>
-                    <div class="menu-options">
+                    <div class="menu-options grid-2x2">
                         <div class="menu-option" data-attack="normal" id="normalAttackOption"></div>
                         <div class="menu-option special" data-attack="special" id="specialAttackOption"></div>
                         <div class="menu-option disabled">3. (Reserved Move)</div>

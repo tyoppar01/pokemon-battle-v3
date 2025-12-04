@@ -4,6 +4,7 @@
 import { PokemonSprites } from '../helpers/pokemonSprites.js';
 
 export class BattleUI {
+    
     /**
      * Show battle screen
      */
@@ -29,10 +30,15 @@ export class BattleUI {
         // Update HP
         this.updateHealthBar(1, pokemon1);
         this.updateHealthBar(2, pokemon2);
+    }
 
-        // Update attack options
-        document.getElementById('normalAttackOption').textContent = `1. ${pokemon1.normalAttack?.name || 'Tackle'}`;
-        document.getElementById('specialAttackOption').textContent = `2. ${pokemon1.specialAttack?.name || 'No Special Attack'}`;
+    /**
+     * Update fight menu with current player's attacks
+     * @param {Pokemon} currentPokemon - The active Pokemon whose turn it is
+     */
+    static updateFightMenu(currentPokemon) {
+        document.getElementById('normalAttackOption').textContent = `1. ${currentPokemon.normalAttack?.name || 'Tackle'}`;
+        document.getElementById('specialAttackOption').textContent = `2. ${currentPokemon.specialAttack?.name || currentPokemon.specialSkill || 'Special Attack'}`;
     }
 
     /**
@@ -115,9 +121,14 @@ export class BattleUI {
      */
     static updateLog(battleLog) {
         const terminal = document.getElementById('battleLogTerminal');
-        terminal.innerHTML = battleLog.map(entry => 
-            `<div class="log-entry ${entry.type}">${entry.message}</div>`
-        ).join('');
+        terminal.innerHTML = battleLog.map(entry => {
+            // Handle both string and object formats
+            if (typeof entry === 'string') {
+                return `<div class="log-entry">${entry}</div>`;
+            } else {
+                return `<div class="log-entry ${entry.type || ''}">${entry.message || entry}</div>`;
+            }
+        }).join('');
         terminal.scrollTop = terminal.scrollHeight;
     }
 }
