@@ -2,6 +2,7 @@ import { Character, Pokemon, Attack } from './models.js';
 import { PokeBattle } from './battle.js';
 import { APIService } from './api.js';
 import { MainMenuUI, BattleUI, UserUI, PokemonUI } from './components/index.js';
+import { soundManager } from './helpers/soundManager.js';
 
 /**
  * Main Application Controller
@@ -13,6 +14,7 @@ class BattleApp {
         this.users = [];
         this.selectedTeam = [];
         this.battle = null;
+        this.soundManager = soundManager;
         this.init();
     }
 
@@ -20,6 +22,7 @@ class BattleApp {
         MainMenuUI.showLogo();
         await this.loadUsers();
         this.attachEventListeners();
+        this.attachSoundEffects();
         MainMenuUI.show();
     }
 
@@ -146,11 +149,13 @@ class BattleApp {
         
         try {
             await this.apiService.deleteUser(userId);
+            this.soundManager.playConfirm();
             alert(`✓ Trainer "${user.name}" has been deleted!`);
             // Refresh the users list
             await this.showViewUsersScreen();
         } catch (error) {
             console.error('Failed to delete user:', error);
+            this.soundManager.playError();
             alert('✗ Failed to delete trainer. Please try again.');
         }
     }
@@ -223,7 +228,7 @@ class BattleApp {
         UserUI.updateTeamDisplay(this.selectedTeam);
     }
 
-    /**     
+    /**
      * Create a new trainer with selected Pokemon
      */
     async createTrainer() {
@@ -231,11 +236,13 @@ class BattleApp {
         const gender = document.getElementById('newTrainerGender').value;
 
         if (!name) {
+            this.soundManager.playError();
             alert('Please enter a trainer name!');
             return;
         }
 
         if (this.selectedTeam.length === 0) {
+            this.soundManager.playError();
             alert('Please select at least one Pokemon!');
             return;
         }
@@ -249,16 +256,18 @@ class BattleApp {
                 await this.apiService.addPokemonToUser(user.id, pokemonType);
             }
 
+            this.soundManager.playConfirm();
             alert(`Trainer ${name} created successfully with ${this.selectedTeam.length} Pokemon!`);
             await this.loadUsers();
             MainMenuUI.show();
         } catch (error) {
+            this.soundManager.playError();
             alert('Failed to create trainer. Please try again.');
             console.error(error);
         }
-    }
-
-    /**     
+    }    
+    
+    /**
      * Start a battle between two selected trainers
      */
     async startBattle() {
@@ -266,14 +275,19 @@ class BattleApp {
         const player2Id = document.getElementById('player2Select').value;
 
         if (!player1Id || !player2Id) {
+            this.soundManager.playError();
             alert('Please select both trainers!');
             return;
         }
 
         if (player1Id === player2Id) {
+            this.soundManager.playError();
             alert('Please select different trainers!');
             return;
         }
+
+        // Play battle start sound
+        this.soundManager.playBattleStart();
 
         try {
             // Get user data
@@ -344,18 +358,24 @@ class BattleApp {
         BattleUI.showFightMenu();
     }
 
-    /**     
+    /**
      * Execute an attack
      * @param {boolean} isSpecial 
      */
     executeAttack(isSpecial) {
         if (!this.battle) return;
 
+        // Play attack sound
+        this.soundManager.playAttack();
+
         const result = isSpecial 
             ? this.battle.useSpecialAttack()
             : this.battle.attack();
         
         if (result.success) {
+            // Play damage sound after a short delay
+            setTimeout(() => this.soundManager.playDamage(), 150);
+            
             BattleUI.updateDisplay(this.battle.activePokemon1, this.battle.activePokemon2);
             BattleUI.updateLog(this.battle.getBattleLog());
             
@@ -370,6 +390,50 @@ class BattleApp {
                 BattleUI.showActionsMenu();
             }
         }
+    }    /**
+     * Attach sound effects to all interactive elements
+     */
+    attachSoundEffects() {
+        // Add click sounds to all menu options
+        document.querySelectorAll('.menu-option:not(.disabled)').forEach(option => {
+            option.addEventListener('click', () => this.soundManager.playButtonClick());
+            option.addEventListener('mouseenter', () => this.soundManager.playHover());
+        });
+
+        // Add sounds to all buttons
+        document.querySelectorAll('button.terminal-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (btn.classList.contains('secondary')) {
+                    this.soundManager.playCancel();
+                } else {
+                    this.soundManager.playConfirm();
+                }
+            });
+        });
+
+        // Add sounds to delete buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-user-btn')) {
+                this.soundManager.playCancel();
+            }
+        });
+
+        // Add sounds to select dropdowns
+        document.querySelectorAll('select.terminal-select').forEach(select => {
+            select.addEventListener('change', () => this.soundManager.playSelect());
+        });
+
+        // Add sounds to Pokemon options
+        document.querySelectorAll('.pokemon-option').forEach(option => {
+            option.addEventListener('click', () => this.soundManager.playButtonClick());
+        });
+
+        // Add hover sounds to user cards
+        document.addEventListener('mouseenter', (e) => {
+            if (e.target.classList.contains('user-card')) {
+                this.soundManager.playHover();
+            }
+        }, true);
     }
 }
 
