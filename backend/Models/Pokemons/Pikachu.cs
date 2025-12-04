@@ -13,6 +13,7 @@ namespace PokemonBattle.Pokemons {
             Speed = 90 + (level * 5);
             NormalAttack = new Tackle(Attack);
             SpecialAttack = new ThunderShock(Attack);
+            SpecialSkill = SpecialAttack.Name;
         }
     }
     
