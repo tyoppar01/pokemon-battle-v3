@@ -2,6 +2,11 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PokemonBattle.Data.Entities {
+
+    /**
+        * User Entity
+        * Represents a user in the system
+     */
     
     [Table("Users")]
     public class UserEntity {

@@ -3,6 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PokemonBattle.Data.Entities {
     
+    /**
+        * Pokemon Entity
+        * Represents a Pokemon owned by a user
+     */
     [Table("Pokemon")]
     public class PokemonEntity {
         [Key]

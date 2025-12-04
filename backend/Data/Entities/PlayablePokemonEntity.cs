@@ -3,6 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PokemonBattle.Data.Entities {
     
+    /**
+        * Playable Pokemon Entity
+        * Represents a Pokemon that can be chosen by users
+    */
+
     [Table("PlayablePokemon")]
     public class PlayablePokemonEntity {
         [Key]

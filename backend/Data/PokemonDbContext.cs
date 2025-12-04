@@ -4,12 +4,22 @@ using PokemonBattle.Services;
 
 namespace PokemonBattle.Data {
     
+    /**
+        * Pokemon Database Context
+        * Manages database access for users and Pokemon
+    */
     public class PokemonDbContext : DbContext {
-        
+
+        /**
+            * Database Sets
+        */  
         public DbSet<UserEntity> Users { get; set; }
         public DbSet<PokemonEntity> Pokemon { get; set; }
         public DbSet<PlayablePokemonEntity> PlayablePokemon { get; set; }
 
+        /**
+            * Constructor
+        */
         public PokemonDbContext(DbContextOptions<PokemonDbContext> options) : base(options) {
         }
 
@@ -31,91 +41,7 @@ namespace PokemonBattle.Data {
         }
 
         private void SeedDefaultPokemon(ModelBuilder modelBuilder) {
-            // Create default users
-            modelBuilder.Entity<UserEntity>().HasData(
-                new UserEntity {
-                    Id = "default_user_1",
-                    Name = "Ash",
-                    Gender = "Male",
-                    CreatedAt = DateTime.UtcNow
-                },
-                new UserEntity {
-                    Id = "default_user_2",
-                    Name = "Gary",
-                    Gender = "Male",
-                    CreatedAt = DateTime.UtcNow
-                }
-            );
-
-            // Use Pokemon models to generate seed data
-            var pikachu = PokemonFactory.CreatePokemon("Pikachu", "Pikachu", 5);
-            var charmander = PokemonFactory.CreatePokemon("Charmander", "Charmander", 5);
-            var bulbasaur = PokemonFactory.CreatePokemon("Bulbasaur", "Bulbasaur", 5);
-            var squirtle = PokemonFactory.CreatePokemon("Squirtle", "Squirtle", 5);
-
-            // Seed default Pokemon for user 1 (Ash)
-            modelBuilder.Entity<PokemonEntity>().HasData(
-                new PokemonEntity {
-                    Id = 1,
-                    UserId = "default_user_1",
-                    Name = pikachu.Name,
-                    Type = pikachu.Type.ToString(),
-                    MaxHitPoint = pikachu.MaxHitPoint,
-                    CurrentHitPoint = pikachu.CurrentHitPoint,
-                    Attack = pikachu.Attack,
-                    Defense = pikachu.Defense,
-                    Level = pikachu.Level,
-                    Speed = pikachu.Speed,
-                    SpecialSkill = pikachu.SpecialAttack?.Name ?? "Unknown",
-                    CreatedAt = DateTime.UtcNow
-                },
-                new PokemonEntity {
-                    Id = 2,
-                    UserId = "default_user_1",
-                    Name = charmander.Name,
-                    Type = charmander.Type.ToString(),
-                    MaxHitPoint = charmander.MaxHitPoint,
-                    CurrentHitPoint = charmander.CurrentHitPoint,
-                    Attack = charmander.Attack,
-                    Defense = charmander.Defense,
-                    Level = charmander.Level,
-                    Speed = charmander.Speed,
-                    SpecialSkill = charmander.SpecialAttack?.Name ?? "Unknown",
-                    CreatedAt = DateTime.UtcNow
-                }
-            );
-
-            // Seed default Pokemon for user 2 (Gary)
-            modelBuilder.Entity<PokemonEntity>().HasData(
-                new PokemonEntity {
-                    Id = 3,
-                    UserId = "default_user_2",
-                    Name = bulbasaur.Name,
-                    Type = bulbasaur.Type.ToString(),
-                    MaxHitPoint = bulbasaur.MaxHitPoint,
-                    CurrentHitPoint = bulbasaur.CurrentHitPoint,
-                    Attack = bulbasaur.Attack,
-                    Defense = bulbasaur.Defense,
-                    Level = bulbasaur.Level,
-                    Speed = bulbasaur.Speed,
-                    SpecialSkill = bulbasaur.SpecialAttack?.Name ?? "Unknown",
-                    CreatedAt = DateTime.UtcNow
-                },
-                new PokemonEntity {
-                    Id = 4,
-                    UserId = "default_user_2",
-                    Name = squirtle.Name,
-                    Type = squirtle.Type.ToString(),
-                    MaxHitPoint = squirtle.MaxHitPoint,
-                    CurrentHitPoint = squirtle.CurrentHitPoint,
-                    Attack = squirtle.Attack,
-                    Defense = squirtle.Defense,
-                    Level = squirtle.Level,
-                    Speed = squirtle.Speed,
-                    SpecialSkill = squirtle.SpecialAttack?.Name ?? "Unknown",
-                    CreatedAt = DateTime.UtcNow
-                }
-            );
+            // No default users - users must be created through the application
         }
         
         private void SeedPlayablePokemon(ModelBuilder modelBuilder) {
