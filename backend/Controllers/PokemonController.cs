@@ -18,9 +18,9 @@ namespace PokemonBattle.Controllers {
         }
 
         /// <summary>
-        /// Get all playable Pokemon with their base stats and information
+        /// Gets all playable Pokemon available in the roster
         /// </summary>
-        /// <returns>List of all available Pokemon</returns>
+        /// <returns>List of all playable Pokemon with count</returns>
         [HttpGet("playable")]
         public async Task<IActionResult> GetAllPlayablePokemon() {
             try {
@@ -35,10 +35,10 @@ namespace PokemonBattle.Controllers {
         }
 
         /// <summary>
-        /// Get detailed information about a specific playable Pokemon
+        /// Gets a specific playable Pokemon by name
         /// </summary>
-        /// <param name="name">Pokemon name (e.g., Pikachu, Charmander)</param>
-        /// <returns>Detailed Pokemon information</returns>
+        /// <param name="name">The name of the Pokemon to retrieve</param>
+        /// <returns>Pokemon details if found, 404 if not found</returns>
         [HttpGet("playable/{name}")]
         public async Task<IActionResult> GetPlayablePokemonByName(string name) {
             try {
@@ -55,9 +55,9 @@ namespace PokemonBattle.Controllers {
         }
 
         /// <summary>
-        /// Get list of available Pokemon types (simple list)
+        /// Gets all available Pokemon types in the roster
         /// </summary>
-        /// <returns>List of Pokemon type names</returns>
+        /// <returns>List of Pokemon types with count</returns>
         [HttpGet("types")]
         public async Task<IActionResult> GetAvailablePokemonTypes() {
             try {
@@ -69,10 +69,10 @@ namespace PokemonBattle.Controllers {
         }
 
         /// <summary>
-        /// Get Pokemon filtered by type
+        /// Filters Pokemon by their type
         /// </summary>
-        /// <param name="type">Pokemon type (e.g., Electric, Fire, Water)</param>
-        /// <returns>List of Pokemon matching the type</returns>
+        /// <param name="type">The Pokemon type to filter by</param>
+        /// <returns>List of Pokemon matching the specified type, 404 if none found</returns>
         [HttpGet("filter/type/{type}")]
         public async Task<IActionResult> GetPokemonByType(string type) {
             try {
@@ -93,10 +93,10 @@ namespace PokemonBattle.Controllers {
         }
 
         /// <summary>
-        /// Get Pokemon stats comparison (all Pokemon sorted by a specific stat)
+        /// Gets Pokemon sorted by a specific stat (HP, Attack, Defense, Speed)
         /// </summary>
-        /// <param name="stat">Stat to sort by: hp, attack, defense, or speed</param>
-        /// <returns>Pokemon sorted by specified stat</returns>
+        /// <param name="stat">The stat name to sort by</param>
+        /// <returns>List of Pokemon sorted by the specified stat in descending order</returns>
         [HttpGet("stats/{stat}")]
         public async Task<IActionResult> GetPokemonByStats(string stat) {
             try {
@@ -113,9 +113,9 @@ namespace PokemonBattle.Controllers {
         }
 
         /// <summary>
-        /// Get Pokemon statistics summary
+        /// Gets statistical summary of all Pokemon (averages, counts, etc.)
         /// </summary>
-        /// <returns>Summary statistics about all Pokemon</returns>
+        /// <returns>Pokemon statistics including total count and average stats</returns>
         [HttpGet("statistics")]
         public async Task<IActionResult> GetPokemonStatistics() {
             try {
@@ -127,10 +127,10 @@ namespace PokemonBattle.Controllers {
         }
 
         /// <summary>
-        /// Check if a Pokemon exists
+        /// Checks if a Pokemon exists in the playable roster by name
         /// </summary>
-        /// <param name="name">Pokemon name</param>
-        /// <returns>Boolean indicating if Pokemon exists</returns>
+        /// <param name="name">The name of the Pokemon to check</param>
+        /// <returns>Boolean indicating whether the Pokemon exists</returns>
         [HttpGet("exists/{name}")]
         public async Task<IActionResult> PokemonExists(string name) {
             try {
