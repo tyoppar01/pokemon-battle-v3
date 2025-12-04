@@ -10,9 +10,10 @@ namespace PokemonBattle.Pokemons {
             CurrentHitPoint = MaxHitPoint;
             Attack = 52 + (level * 4);
             Defense = 43 + (level * 2);
-            Speed = 65 + (level * 4);
+            Speed = 65 + (level * 3);
             NormalAttack = new Tackle(Attack);
             SpecialAttack = new Ember(Attack);
+            SpecialSkill = SpecialAttack.Name;
         }
     }
     

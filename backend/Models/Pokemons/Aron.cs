@@ -11,9 +11,10 @@ namespace PokemonBattle.Pokemons {
             CurrentHitPoint = MaxHitPoint;
             Attack = 70 + (level * 3);
             Defense = 100 + (level * 4);
-            Speed = 30 + (level * 2);
-            NormalAttack = new IronHead(Attack);
+            Speed = 30 + (level * 1);
+            NormalAttack = new Tackle(Attack);
             SpecialAttack = new MetalClaw(Attack);
+            SpecialSkill = SpecialAttack.Name;
         }
     }
     

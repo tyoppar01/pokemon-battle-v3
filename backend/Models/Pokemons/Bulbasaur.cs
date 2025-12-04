@@ -10,9 +10,10 @@ namespace PokemonBattle.Pokemons {
             CurrentHitPoint = MaxHitPoint;
             Attack = 49 + (level * 3);
             Defense = 49 + (level * 3);
-            Speed = 45 + (level * 3);
+            Speed = 45 + (level * 2);
             NormalAttack = new Tackle(Attack);
             SpecialAttack = new VineWhip(Attack);
+            SpecialSkill = SpecialAttack.Name;
         }
     }
     
