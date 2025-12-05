@@ -24,6 +24,13 @@
     
     <!-- Loads environment variables from .env file -->
     <PackageReference Include="DotNetEnv" Version="3.1.1" />
+
+    <!-- Testing frameworks -->
+    <PackageReference Include="NUnit" Version="4.4.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
+    <PackageReference Include="Moq" Version="4.20.72" />
   </ItemGroup>
 
 </Project>
