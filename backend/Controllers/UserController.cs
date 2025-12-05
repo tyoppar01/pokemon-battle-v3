@@ -7,7 +7,6 @@ namespace PokemonBattle.Controllers {
 
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class UserController : ControllerBase {
         private readonly UserService _userService;
 
@@ -16,7 +15,6 @@ namespace PokemonBattle.Controllers {
         }
 
         [HttpPost]
-        [AllowAnonymous]
         public IActionResult CreateUser([FromBody] CreateUserRequest request) {
 
             // Validation: Name is required
@@ -54,11 +52,6 @@ namespace PokemonBattle.Controllers {
                 return BadRequest(new { error = "User ID is required" });
             }
 
-            // Validation: Check if ID is valid format (e.g., GUID)
-            if (!System.Guid.TryParse(id, out _)) {
-                return BadRequest(new { error = "Invalid User ID format" });
-            }
-
             var user = _userService.GetUser(id);
             
             // Check if user exists
@@ -71,7 +64,6 @@ namespace PokemonBattle.Controllers {
         }
 
         [HttpGet]
-        [AllowAnonymous]
         public IActionResult GetAllUsers() {
             var users = _userService.GetAllUsers();
             var response = users.Select(kvp => UserResponse.FromCharacter(kvp.Value, kvp.Key)).ToList();
@@ -84,9 +76,6 @@ namespace PokemonBattle.Controllers {
             // Validation: Check if ID is provided
             if (string.IsNullOrWhiteSpace(id)) {
                 return BadRequest(new { error = "User ID is required" });
-            }
-            if (!System.Guid.TryParse(id, out _)) {
-                return BadRequest(new { error = "Invalid User ID format" });
             }
 
             bool deleted = _userService.DeleteUser(id);
@@ -104,9 +93,6 @@ namespace PokemonBattle.Controllers {
             // Validation: Check if ID is provided
             if (string.IsNullOrWhiteSpace(id)) {
                 return BadRequest(new { error = "User ID is required" });
-            }
-            if (!System.Guid.TryParse(id, out _)) {
-                return BadRequest(new { error = "Invalid User ID format" });
             }
 
             if (string.IsNullOrWhiteSpace(request.Name)) {
@@ -141,9 +127,6 @@ namespace PokemonBattle.Controllers {
             // Validation: Check if ID is provided
             if (string.IsNullOrWhiteSpace(id)) {
                 return BadRequest(new { error = "User ID is required" });
-            }
-            if (!System.Guid.TryParse(id, out _)) {
-                return BadRequest(new { error = "Invalid User ID format" });
             }
             
             var user = _userService.GetUser(id);
@@ -180,9 +163,6 @@ namespace PokemonBattle.Controllers {
             if (string.IsNullOrWhiteSpace(id)) {
                 return BadRequest(new { error = "User ID is required" });
             }
-            if (!System.Guid.TryParse(id, out _)) {
-                return BadRequest(new { error = "Invalid User ID format" });
-            }
 
             var user = _userService.GetUser(id);
             if (user == null) {
@@ -205,9 +185,6 @@ namespace PokemonBattle.Controllers {
             if (string.IsNullOrWhiteSpace(id)) {
                 return BadRequest(new { error = "User ID is required" });
             }
-            if (!System.Guid.TryParse(id, out _)) {
-                return BadRequest(new { error = "Invalid User ID format" });
-            }
 
             var pokemon = _userService.GetUserPokemon(id);
             
@@ -220,7 +197,6 @@ namespace PokemonBattle.Controllers {
         }
 
         [HttpGet("pokemon/types")]
-        [AllowAnonymous]
         public IActionResult GetAvailablePokemonTypes() {
             var types = PokemonFactory.GetAvailablePokemonTypes();
             return Ok(types);
