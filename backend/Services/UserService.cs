@@ -4,10 +4,11 @@ using PokemonBattle.Characters;
 using PokemonBattle.Pokemons;
 using PokemonBattle.Data;
 using PokemonBattle.Data.Entities;
+using PokemonBattle.Services.Interfaces;
 
 namespace PokemonBattle.Services {
     
-    public class UserService {
+    public class UserService : IUserService {
         private readonly PokemonDbContext _context;
         private static int userIdCounter = 1;
 

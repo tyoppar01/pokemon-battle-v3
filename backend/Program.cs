@@ -1,4 +1,5 @@
 using PokemonBattle.Services;
+using PokemonBattle.Services.Interfaces;
 using PokemonBattle.Data;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
@@ -44,8 +45,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 // Register custom services
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<PokemonService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPokemonService, PokemonService>();
 builder.Services.AddSingleton(new JwtService(jwtKey, jwtIssuer, jwtAudience, jwtExpiryMinutes));
 
 // Configure CORS for frontend
