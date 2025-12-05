@@ -9,3 +9,5 @@ coverage/
 *.bak
 Thumbs.db
 JWT_IMPLEMENTATION.md
+frontend/node_modules/
+backend/node_modules/
