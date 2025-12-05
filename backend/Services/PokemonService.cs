@@ -4,10 +4,11 @@ using PokemonBattle.DTOs;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using PokemonBattle.Pokemons;
+using PokemonBattle.Services.Interfaces;
 
 namespace PokemonBattle.Services {
     
-    public class PokemonService {
+    public class PokemonService : IPokemonService {
         private readonly PokemonDbContext _context;
         private static readonly Dictionary<string, string> _pokemonDescriptions = new() {
             { "Pikachu", "An Electric-type Pokemon known for its incredible speed and powerful electric attacks." },

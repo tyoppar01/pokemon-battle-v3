@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using PokemonBattle.Services;
+using PokemonBattle.Services.Interfaces;
 using PokemonBattle.DTOs;
 
 namespace PokemonBattle.Controllers {
@@ -8,9 +9,9 @@ namespace PokemonBattle.Controllers {
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
 
-        public UserController(UserService userService) {
+        public UserController(IUserService userService) {
             _userService = userService;
         }
 
